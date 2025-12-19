@@ -1,0 +1,12 @@
+# vector database + embedding libraries
+chromadb==1.0.12
+sentence-transformers==5.1.0
+
+# langchain libraries
+langchain==0.3.27
+langchain-core==0.3.76
+langchain-text-splitters==0.3.11
+
+# configuration management
+pyyaml
+python-dotenv==1.0.0
