@@ -1,7 +1,10 @@
 import yaml
 import os
 
-config_path = "properties/vector_config.yaml"
+from pathlib import Path
+
+config_path = Path(__file__).resolve().parent / 'vector-config.yaml'
+
 
 def load_config():
     if not os.path.exists(config_path):

@@ -3,6 +3,10 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
 from properties.vector_config_loader import load_config as vector_config
 
+import logging
+
+from pathlib import Path
+
 class VectorDB:
 
     def __init__(self, collection_name: str = None,
@@ -18,6 +22,7 @@ class VectorDB:
         # Load configuration
         config = vector_config()
 
+        self.load_into_vector = config.get(db_type, {}).get("load_into_vector", False)
         self.chunk_type = config.get(db_type, {}).get("chunk_type", "text-splitter")
 
         self.collection_name = collection_name or config.get(db_type, {}).get(
@@ -80,3 +85,39 @@ class VectorDB:
             raise ValueError(f"Unknown chunk type: {self.chunk_type}")
         
     
+    def load_documents() -> list[str]:
+        """
+        Load documents for demonstration.
+
+        Returns:
+            List of sample documents
+        """
+        results = []
+        documents_path = Path(__file__).resolve().parent.parent / "raw_data"
+
+        for files in documents_path.glob("*.txt"):
+            with open(files, 'r', encoding='utf-8') as file:
+                results.append(file.read())
+        
+        return results
+
+
+    def add_document(self, doc_list: list[str]) -> None:
+        """
+        Add documents to the vector database.
+        
+        Args:
+            doc_list: List of text documents paths which to be added to the vector DB
+        """
+
+        if self.load_into_vector is False:
+            print("Loading into vector DB is disabled in the configuration.")
+            return
+        
+        if doc_list is None or len(doc_list) == 0:
+            logging.info("starting to load documents form raw_data...")
+            doc_list = self.load_documents()
+        
+        for doc in doc_list:
+            chunks = self.chunk_documents(text=doc, chunk_size=500, chunk_overlap=50)
+            # self.embedding_model.
