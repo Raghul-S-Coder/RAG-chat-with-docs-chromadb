@@ -14,6 +14,7 @@ The document loading behavior is configurable through a YAML-based configuration
 
 ## Project Structure
 
+```text
 RAG-chat-with-docs-chromadb/
 │
 ├── main.py
@@ -41,7 +42,7 @@ RAG-chat-with-docs-chromadb/
 │       # Utility to load and parse vector-config.yaml.
 │
 └── README.md
-
+```
 
 ---
 
