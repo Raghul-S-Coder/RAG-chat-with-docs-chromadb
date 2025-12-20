@@ -1,4 +1,4 @@
-load_into_vector: true
+load_into_vector: False
 
 # ChromaDB configuration
 chromadb:

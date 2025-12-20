@@ -22,7 +22,7 @@ class VectorDB:
         # Load configuration
         config = vector_config()
 
-        self.load_into_vector = config.get(db_type, {}).get("load_into_vector", False)
+        self.load_into_vector = config.get("load_into_vector", False)
         self.chunk_type = config.get(db_type, {}).get("chunk_type", "text-splitter")
 
         self.collection_name = collection_name or config.get(db_type, {}).get(
@@ -38,7 +38,7 @@ class VectorDB:
         ))
 
         # Load embedding model
-        print(f"Loading embedding model: {self.embedding_model_name}")
+        logging.info(f"Loading embedding model: {self.embedding_model_name}")
         self.embedding_model = SentenceTransformer(self.embedding_model_name)
 
         # Get or create collection
@@ -47,7 +47,7 @@ class VectorDB:
             metadata={"description": "RAG document collection"},
         )
 
-        print(f"Vector database initialized with collection: {self.collection_name}")
+        logging.info(f"Vector database initialized with collection: {self.collection_name}")
 
     def chunk_documents(self, text: str, chunk_size: int = 500, chunk_overlap: int = 50) -> list[str]:
         """
@@ -85,7 +85,7 @@ class VectorDB:
             raise ValueError(f"Unknown chunk type: {self.chunk_type}")
         
     
-    def load_documents() -> list[str]:
+    def load_documents(self) -> list[str]:
         """
         Load documents for demonstration.
 
@@ -102,7 +102,7 @@ class VectorDB:
         return results
 
 
-    def add_document(self, doc_list: list[str]) -> None:
+    def add_documents(self, doc_list: list[str] | None = None) -> None:
         """
         Add documents to the vector database.
         
@@ -111,13 +111,65 @@ class VectorDB:
         """
 
         if self.load_into_vector is False:
-            print("Loading into vector DB is disabled in the configuration.")
+            logging.info("Loading into vector DB is disabled in the configuration.")
             return
         
         if doc_list is None or len(doc_list) == 0:
             logging.info("starting to load documents form raw_data...")
             doc_list = self.load_documents()
         
-        for doc in doc_list:
+      
+        doc_id = "doc_id_"
+        counter = 0
+        for i, doc in enumerate(doc_list):
+            logging.info("Processing document...\n", i)
             chunks = self.chunk_documents(text=doc, chunk_size=500, chunk_overlap=50)
-            # self.embedding_model.
+            for chunk in chunks:
+                embeddings =self.embedding_model.encode([chunk])
+                self.collection.add(embeddings=embeddings,
+                                    metadatas={"doc": chunk},
+                                    ids=doc_id + str(counter),
+                                    documents=[chunk])
+                counter += 1
+
+    def get_all_documents(self) -> None:
+        """Print all documents in the vector database."""
+
+        results = self.collection.get()
+        logging.info(f"Total documents in vector DB: {self.collection.count()}")
+        logging.info(results)
+        logging.info("done uploading, now printing all the documents in the vector db")
+
+        for i, meta in enumerate(results["metadatas"]):
+            logging.info(f"ID: {results['ids'][i]}")
+            logging.info("Chunk text:", meta["doc"])
+            logging.info("-" * 40)
+
+
+    def delete_all_data(self) -> None:
+        """Delete all documents in the vector database."""
+        self.collection.delete(ids=self.collection.get().get("ids", []))
+        logging.info("All data deleted from the vector database.")
+
+        # or alternative way to delete all data
+        # self.collection.delete(ids=self.collection.get()["ids"])
+        # logging.info(self.collection.count())
+
+    
+    def similarity_search(self, query: str, n_results: int = 5) -> dict[str, any]:
+        """
+        Perform a similarity search in the vector database.
+
+        Args:
+            query: The query text
+            n_results: Number of similar results to retrieve
+        """
+
+        query_embedding = self.embedding_model.encode([query])
+        logging.info("Performing similarity search...")
+        results = self.collection.query(
+            query_embeddings=query_embedding,
+            n_results=n_results,
+        )
+
+        return results
