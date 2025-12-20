@@ -1,0 +1,16 @@
+load_into_vector: False
+
+# ChromaDB configuration
+chromadb:
+  persist_directory: ./chroma_db
+  collection_name: rag_documents
+  embedding_function: sentence-transformers/all-MiniLM-L6-v2
+  # text-splitter, simple-word, semantic-splitting
+  chunk_type: text-splitter
+
+# qdrant configuration
+qdrant:
+  host: localhost
+  port: 6333
+  collection_name: rag_documents
+  embedding_function: sentence-transformers/all-MiniLM-L6-v2
