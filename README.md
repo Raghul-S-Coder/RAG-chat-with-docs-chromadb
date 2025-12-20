@@ -1,6 +1,6 @@
 # RAG-chat-with-docs-chromadb
 
-A Python-based **Retrieval-Augmented Generation (RAG)** project that enables question answering and summarization over user-provided documents using **ChromaDB** and **Hugging Face embeddings**.
+A Python-based **Retrieval-Augmented Generation (RAG)** project that enables question answering and summarization over user-provided documents using **ChromaDB** and **Hugging Face embeddings**, In simple term its a RAG based chat bot.
 
 ---
 
@@ -87,12 +87,38 @@ This model provides fast and efficient sentence-level embeddings suitable for se
 
 ---
 
+## Environment Configuration (.env)
+
+The project supports multiple LLM providers. **At least one API configuration must be provided** in the `.env` file.  
+Based on the available configuration, the application will automatically initialize the corresponding LLM client.
+
+An example configuration is provided in `.env-example`.
+
+```
+
+# OpenAI API Configuration
+
+OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_MODEL=gpt-4o-mini
+
+# Groq API Configuration (alternative to OpenAI)
+
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=llama-3.1-8b-instant
+
+# Google Gemini API Configuration (alternative to OpenAI/Groq)
+
+GOOGLE_API_KEY=your_google_api_key_here
+GOOGLE_MODEL=gemini-pro
+```
+
+If multiple providers are configured, the application will select the appropriate LLM based on the internal configuration logic.
+---
+
 ## Requirements
 
 - Python 3.8+
-- ChromaDB
-- Hugging Face `sentence-transformers`
-- A supported LLM provider
+- LLM Provider API Key
 
 ---
 
