@@ -17,30 +17,31 @@ The document loading behavior is configurable through a YAML-based configuration
 RAG-chat-with-docs-chromadb/
 │
 ├── main.py
-│ # Entry point of the application.
-│ # Loads documents into ChromaDB (based on config)
-│ # and invokes the LLM for summarization or Q&A.
+│   # Entry point of the application.
+│   # Loads documents into ChromaDB (based on config)
+│   # and invokes the LLM for summarization or Q&A.
 │
 ├── src/
-│ └── vector_db.py
-│ # Handles vector database creation, embedding,
-│ # and interaction with ChromaDB.
+│   └── vector_db.py
+│       # Handles vector database creation, embedding,
+│       # and interaction with ChromaDB.
 │
 ├── raw_data/
-│ # Contains sample input documents for embedding.
-│ # Currently supports `.txt` files only.
+│   # Contains sample input documents for embedding.
+│   # Currently supports .txt files only.
 │
 ├── properties/
-│ ├── vector-config.yaml
-│ # Configuration file for vector database behavior.
-│ #
-│ # Example:
-│ # load_into_vector: true
+│   ├── vector-config.yaml
+│   # Configuration file for vector database behavior.
+│   #
+│   # Example:
+│   # load_into_vector: true
 │
-│ └── vector_config_loader.py
-│ # Utility to load and parse vector-config.yaml.
+│   └── vector_config_loader.py
+│       # Utility to load and parse vector-config.yaml.
 │
 └── README.md
+
 
 ---
 
