@@ -120,8 +120,9 @@ class VectorDB:
         if doc_list is None or len(doc_list) == 0:
             logging.info("starting to load documents form raw_data...")
             doc_list = self.load_documents()
+        else:
+            logging.info("starting to load documents from provided list...")
         
-      
         doc_id = "doc_id_"
         counter = 0
         for i, doc in enumerate(doc_list):

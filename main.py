@@ -85,6 +85,7 @@ class RAGAssignment:
 
 def main():
     """Main function to demonstrate the RAG assistant."""
+    print("Starting RAG Assignment AI Assistant...")
     assignment = RAGAssignment()
 
     # loads based on the yaml config field = load_into_vector
