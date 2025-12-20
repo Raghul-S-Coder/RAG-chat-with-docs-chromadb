@@ -95,7 +95,6 @@ Based on the available configuration, the application will automatically initial
 An example configuration is provided in `.env-example`.
 
 ```
-
 # OpenAI API Configuration
 
 OPENAI_API_KEY=your_openai_api_key_here
@@ -111,8 +110,8 @@ GROQ_MODEL=llama-3.1-8b-instant
 GOOGLE_API_KEY=your_google_api_key_here
 GOOGLE_MODEL=gemini-pro
 ```
-
 If multiple providers are configured, the application will select the appropriate LLM based on the internal configuration logic.
+
 ---
 
 ## Requirements
