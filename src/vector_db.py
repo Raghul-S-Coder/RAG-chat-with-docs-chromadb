@@ -8,6 +8,9 @@ import logging
 from pathlib import Path
 
 class VectorDB:
+    """
+    A simple vector database wrapper using ChromaDB with HuggingFace embeddings.
+    """
 
     def __init__(self, collection_name: str = None,
                   embedding_model: str = None,
