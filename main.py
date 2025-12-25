@@ -9,11 +9,11 @@ from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 
+from src.vector_db import VectorDB
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 
-from src.vector_db import VectorDB
 
 class RAGAssignment:
     """

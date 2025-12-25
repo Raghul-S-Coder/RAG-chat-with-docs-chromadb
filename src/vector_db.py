@@ -1,11 +1,12 @@
+import logging
+from pathlib import Path
+
 import chromadb
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
+
 from properties.vector_config_loader import load_config as vector_config
 
-import logging
-
-from pathlib import Path
 
 class VectorDB:
     """
@@ -13,8 +14,8 @@ class VectorDB:
     """
 
     def __init__(self, collection_name: str = None,
-                  embedding_model: str = None,
-                  db_type: str = "chromadb"):
+                 embedding_model: str = None,
+                 db_type: str = "chromadb"):
         """
         Initialize the vector database.
 
@@ -41,7 +42,7 @@ class VectorDB:
         ))
 
         # Load embedding model
-        logging.info(f"Loading embedding model: {self.embedding_model_name}")
+        logging.info(f"Loading embedding model: {self.embedding_model_name}, collection name: {self.collection_name}")
         self.embedding_model = SentenceTransformer(self.embedding_model_name)
 
         # Get or create collection
@@ -61,7 +62,7 @@ class VectorDB:
             chunk_size: Size of each chunk
             chunk_overlap: Overlap between chunks
         """
-        
+
         chunks = []
         if self.chunk_type == "simple-word":
             start = 0
@@ -86,8 +87,7 @@ class VectorDB:
             raise NotImplementedError("Semantic splitting is not implemented yet.")
         else:
             raise ValueError(f"Unknown chunk type: {self.chunk_type}")
-        
-    
+
     def load_documents(self) -> list[str]:
         """
         Load documents for demonstration.
@@ -101,9 +101,8 @@ class VectorDB:
         for files in documents_path.glob("*.txt"):
             with open(files, 'r', encoding='utf-8') as file:
                 results.append(file.read())
-        
-        return results
 
+        return results
 
     def add_documents(self, doc_list: list[str] | None = None) -> None:
         """
@@ -116,22 +115,22 @@ class VectorDB:
         if self.load_into_vector is False:
             logging.info("Loading into vector DB is disabled in the configuration.")
             return
-        
+
         if doc_list is None or len(doc_list) == 0:
             logging.info("starting to load documents form raw_data...")
             doc_list = self.load_documents()
         else:
             logging.info("starting to load documents from provided list...")
-        
+        key_for_testing = "789456321"
         doc_id = "doc_id_"
         counter = 0
         for i, doc in enumerate(doc_list):
-            logging.info("Processing document...\n", i)
+            logging.info("Processing document...\n %s", i)
             chunks = self.chunk_documents(text=doc, chunk_size=500, chunk_overlap=50)
             for chunk in chunks:
-                embeddings =self.embedding_model.encode([chunk])
+                embeddings = self.embedding_model.encode([chunk])
                 self.collection.add(embeddings=embeddings,
-                                    metadatas={"doc": chunk},
+                                    metadatas={"doc": chunk, "key_id": key_for_testing},
                                     ids=doc_id + str(counter),
                                     documents=[chunk])
                 counter += 1
@@ -146,9 +145,8 @@ class VectorDB:
 
         for i, meta in enumerate(results["metadatas"]):
             logging.info(f"ID: {results['ids'][i]}")
-            logging.info("Chunk text:", meta["doc"])
+            logging.info("Chunk text: %s", meta["doc"])
             logging.info("-" * 40)
-
 
     def delete_all_data(self) -> None:
         """Delete all documents in the vector database."""
@@ -159,7 +157,6 @@ class VectorDB:
         # self.collection.delete(ids=self.collection.get()["ids"])
         # logging.info(self.collection.count())
 
-    
     def similarity_search(self, query: str, n_results: int = 5) -> dict[str, any]:
         """
         Perform a similarity search in the vector database.
@@ -177,3 +174,34 @@ class VectorDB:
         )
 
         return results
+
+    def similarity_search_with_filter(self, key_filter: dict, query: str, n_results: int = 5) -> dict[str, any]:
+        """
+        Perform a similarity search in the vector database.
+
+        Args:
+            query: The query text
+            n_results: Number of similar results to retrieve
+            key_filter: for key must search
+        """
+
+        query_embedding = self.embedding_model.encode([query])
+        logging.info("Performing similarity search...with filter")
+        results = self.collection.query(
+            query_embeddings=query_embedding,
+            n_results=n_results,
+            where=key_filter
+        )
+
+        return results
+
+
+def executor():
+    chroma_db = VectorDB(collection_name="rag-testing-collection")
+    # chroma_db.load_into_vector = False
+    # chroma_db.add_documents()
+    # chroma_db.get_all_documents()
+    print(chroma_db.similarity_search_with_filter({"key_id": "7894563212"}, "artificial"))
+    # print(chroma_db.similarity_search("artifical", 5))
+
+
